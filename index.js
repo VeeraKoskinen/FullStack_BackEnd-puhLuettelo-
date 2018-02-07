@@ -1,5 +1,8 @@
 const express = require('express')
 const app = express()
+const bodyParser = require('body-parser')
+
+app.use(bodyParser.json())
 
 let persons = [
     {
@@ -23,6 +26,8 @@ let persons = [
       id: 4,
     }
 ]
+
+
 
 app.get('/api/persons', (req, res) => {
     res.json(persons)
@@ -50,6 +55,30 @@ app.get('/info', (req, res) => {
         <p> puhelinluettelossa ${persons.length}:n henkilön tiedot </p>
         <p> ${new Date().toUTCString()} </p>
         `)
+})
+
+const generatedId = () => {
+    const maxId = persons.length > 0 ? persons.map(n => n.id).sort().reverse()[0] : 1
+    return maxId + 1
+}
+
+
+app.post('/api/persons', (req, res) => {
+    const body = req.body
+    console.log(body)
+
+    if (body.name === undefined || body.number === undefined) {
+        return res.status(400).json({error: 'content missing'})
+    }
+
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: generatedId()
+    }
+
+    persons = persons.concat(person)
+    res.json(person)
 })
 
 app.delete('/api/persons/:id', (req, res) => {
