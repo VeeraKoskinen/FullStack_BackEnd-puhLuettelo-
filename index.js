@@ -2,30 +2,32 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
+const cors = require('cors')
 
 app.use(bodyParser.json())
 app.use(morgan('tiny'))
+app.use(cors())
 
 
 let persons = [
     {
       name: "Arto Hellas",
-      numero: "040-123456",  
+      number: "040-123456",  
       id: 1,
     },
     {
       name: "Martti Tienari",
-      numero: "040-123456",  
+      number: "040-123456",  
       id: 2,
     },
     {
       name: "Arto Järvinen",
-      numero: "040-123456",  
+      number: "040-123456",  
       id: 3,
     },
     {
       name: "Lea Kutvonen",
-      numero: "040-123456",  
+      number: "040-123456",  
       id: 4,
     }
 ]
@@ -95,6 +97,8 @@ app.delete('/api/persons/:id', (req, res) => {
 })
 
 
-const port = 3001
-app.listen(port)
-console.log(`Server running on port ${port}`)
+const PORT = process.env.PORT || 3001
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})
+
