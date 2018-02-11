@@ -19,6 +19,20 @@ const formatPerson = (person) => {
     }
 }
 
+app.get('/info', (req, res) => { 
+    
+    Person
+    .find({}, {__v: 0})
+    .then(persons => {
+        res.send(`
+            <p> puhelinluettelossa ${persons.length}:n henkilön tiedot </p>
+            <p> ${new Date().toUTCString()} </p>
+        `)
+    })
+
+   
+})
+
 app.get('/api/persons', (req, res) => {
     Person
     .find({}, {__v: 0})
@@ -43,13 +57,6 @@ app.get('/api/persons/:id', (req, res) => {
             console.log(error)
             res.status(400).end()
         }) 
-})
-
-app.get('/info', (req, res) => { 
-    res.send(`
-        <p> puhelinluettelossa ${persons.length}:n henkilön tiedot </p>
-        <p> ${new Date().toUTCString()} </p>
-        `)
 })
 
 app.post('/api/persons', (req, res) => {
