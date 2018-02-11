@@ -40,13 +40,14 @@ const formatPerson = (person) => {
       number: person.number,
       id: person._id
     }
-  }
+}
+
 
 app.get('/api/persons', (req, res) => {
     Person
     .find({}, {__v: 0})
     .then(persons => {
-      res.json(persons.map(formatPerson))
+      res.json(persons.map(formatPerson)) /* tässä muutos.. Person.format(person), formatPersonin tilalla*/
     })
 }) 
 
