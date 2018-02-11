@@ -11,29 +11,6 @@ app.use(cors())
 app.use(express.static('build'))
 
 
-let persons = [
-    {
-      name: "Arto Hellas",
-      number: "040-123456",  
-      id: 1,
-    },
-    {
-      name: "Martti Tienari",
-      number: "040-123456",  
-      id: 2,
-    },
-    {
-      name: "Arto Järvinen",
-      number: "040-123456",  
-      id: 3,
-    },
-    {
-      name: "Lea Kutvonen",
-      number: "040-123456",  
-      id: 4,
-    }
-]
-
 const formatPerson = (person) => {
     return {
       name: person.name,
@@ -42,25 +19,30 @@ const formatPerson = (person) => {
     }
 }
 
-
 app.get('/api/persons', (req, res) => {
     Person
     .find({}, {__v: 0})
     .then(persons => {
-      res.json(persons.map(formatPerson)) /* tässä muutos.. Person.format(person), formatPersonin tilalla*/
+      res.json(persons.map(formatPerson)) 
     })
 }) 
 
 app.get('/api/persons/:id', (req, res) => {
     console.log(req.params.id)
     Person
-    .findById(req.params.id)
-    .then(person => {
-      res.json(formatPerson(person))
-    })
-    .catch(error => {
-        res.status(404).end()
-    }) 
+        .findById(req.params.id)
+        .then(person => {
+            if (person) {
+                res.json(formatPerson(person))
+            } else {
+                res.status(404).end()
+            }
+                
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(400).end()
+        }) 
 })
 
 app.get('/info', (req, res) => { 
@@ -70,12 +52,6 @@ app.get('/info', (req, res) => {
         `)
 })
 
-const generatedId = () => {
-    const maxId = persons.length > 0 ? persons.map(n => n.id).sort().reverse()[0] : 1
-    return maxId + 1
-}
-
-
 app.post('/api/persons', (req, res) => {
     const body = req.body
     console.log(body)
@@ -84,9 +60,9 @@ app.post('/api/persons', (req, res) => {
         return res.status(400).json({error: 'name or number is missing'})
     }
 
-    if (persons.find(person => person.name === body.name)) {
+    /*if (personsListing.find(person => person.name === body.name)) {
         return res.status(400).json({error: 'name must be unique'})
-    }
+    }*/
 
     const person = new Person ({
         name: body.name,
@@ -108,6 +84,24 @@ app.delete('/api/persons/:id', (req, res) => {
     })
     .catch(error => {
       res.status(400).send({ error: 'malformatted id' })
+    })
+})
+
+app.put('/api/persons/:id', (req, res)=> {
+    const body = req.body
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+
+    Person
+    .findByIdAndUpdate(req.params.id, person, {new: true})
+    .then(updatedPerson => {
+        res.json(formatPerson(updatedPerson))
+    })
+    .catch(error => {
+        console.log(error)
+        res.status(400).send({error: 'malformatted id'})
     })
 })
 
