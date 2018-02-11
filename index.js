@@ -70,21 +70,24 @@ app.post('/api/persons', (req, res) => {
     Person
         .find({name: body.name})
         .then(result => {
-            if (result) {
+            console.log('-----!!-----', result)
+            if (result.length > 0) {
                 return res.status(400).send({error: 'Henkilöllä on jo yksi puhelinnumero!'})
+            } else {
+                const person = new Person ({
+                    name: body.name,
+                    number: body.number,
+                })
+            
+                person
+                    .save()
+                    .then(savedPerson => {
+                        res.json(formatPerson(savedPerson))
+                })
             }
         })
 
-    const person = new Person ({
-        name: body.name,
-        number: body.number,
-    })
-
-    person
-        .save()
-        .then(savedPerson => {
-            res.json(formatPerson(savedPerson))
-    })
+   
 })
 
 app.delete('/api/persons/:id', (req, res) => { 
