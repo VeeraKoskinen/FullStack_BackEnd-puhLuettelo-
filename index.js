@@ -67,9 +67,13 @@ app.post('/api/persons', (req, res) => {
         return res.status(400).json({error: 'name or number is missing'})
     }
 
-    /*if (personsListing.find(person => person.name === body.name)) {
-        return res.status(400).json({error: 'name must be unique'})
-    }*/
+    Person
+        .find({name: body.name})
+        .then(result => {
+            if (result) {
+                return res.status(400).send({error: 'Henkilöllä on jo yksi puhelinnumero!'})
+            }
+        })
 
     const person = new Person ({
         name: body.name,
