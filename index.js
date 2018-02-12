@@ -6,19 +6,14 @@ const cors = require('cors')
 const Person = require('./models/person')
 
 app.use(bodyParser.json())
-app.use(morgan('tiny'))
+
+morgan.token('type',  (req, res) => { 
+    return JSON.stringify({name: req.body.name, phone: req.body.number})    
+})
+
+app.use(morgan(':method :url :type :status :response-time ms'))
 app.use(cors())
 app.use(express.static('build'))
-
-/*
-const formatPerson = (person) => {
-    return {
-      name: person.name,
-      number: person.number,
-      id: person._id
-    }
-}
-*/
 
 app.get('/info', (req, res) => { 
     
@@ -29,17 +24,13 @@ app.get('/info', (req, res) => {
             <p> puhelinluettelossa ${persons.length}:n henkilön tiedot </p>
             <p> ${new Date().toUTCString()} </p>
         `)
-    })
-
-   
+    })  
 })
 
 app.get('/api/persons', (req, res) => {
     Person
     .find({}, {__v: 0})
     .then(persons => {
-        console.log('------------!!!-----------')
-        console.log(persons.map(Person.format))
       res.json(persons.map(Person.format)) 
     })
 }) 
@@ -53,8 +44,7 @@ app.get('/api/persons/:id', (req, res) => {
                 res.json(Person.format(person))
             } else {
                 res.status(404).end()
-            }
-                
+            }                
         })
         .catch(error => {
             console.log(error)
@@ -64,7 +54,6 @@ app.get('/api/persons/:id', (req, res) => {
 
 app.post('/api/persons', (req, res) => {
     const body = req.body
-    console.log(body)
 
     if (body.name === undefined || body.number === undefined) {
         return res.status(400).json({error: 'name or number is missing'})
@@ -73,7 +62,6 @@ app.post('/api/persons', (req, res) => {
     Person
         .find({name: body.name})
         .then(result => {
-            console.log('-----!!-----', result)
             if (result.length > 0) {
                 return res.status(400).send({error: 'Henkilöllä on jo yksi puhelinnumero!'})
             } else {
