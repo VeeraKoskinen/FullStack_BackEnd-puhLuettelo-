@@ -10,7 +10,7 @@ app.use(morgan('tiny'))
 app.use(cors())
 app.use(express.static('build'))
 
-
+/*
 const formatPerson = (person) => {
     return {
       name: person.name,
@@ -18,6 +18,7 @@ const formatPerson = (person) => {
       id: person._id
     }
 }
+*/
 
 app.get('/info', (req, res) => { 
     
@@ -37,7 +38,9 @@ app.get('/api/persons', (req, res) => {
     Person
     .find({}, {__v: 0})
     .then(persons => {
-      res.json(persons.map(formatPerson)) 
+        console.log('------------!!!-----------')
+        console.log(persons.map(Person.format))
+      res.json(persons.map(Person.format)) 
     })
 }) 
 
@@ -47,7 +50,7 @@ app.get('/api/persons/:id', (req, res) => {
         .findById(req.params.id)
         .then(person => {
             if (person) {
-                res.json(formatPerson(person))
+                res.json(Person.format(person))
             } else {
                 res.status(404).end()
             }
@@ -82,7 +85,7 @@ app.post('/api/persons', (req, res) => {
                 person
                     .save()
                     .then(savedPerson => {
-                        res.json(formatPerson(savedPerson))
+                        res.json(Person.format(savedPerson))
                 })
             }
         })
@@ -111,7 +114,7 @@ app.put('/api/persons/:id', (req, res)=> {
     Person
     .findByIdAndUpdate(req.params.id, person, {new: true})
     .then(updatedPerson => {
-        res.json(formatPerson(updatedPerson))
+        res.json(Person.format(updatedPerson))
     })
     .catch(error => {
         console.log(error)
